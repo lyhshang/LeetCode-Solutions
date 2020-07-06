@@ -48,88 +48,54 @@
     num 只包含 数字 且不含有 前导 0 。
     1 <= k <= 10^9
 """
-from typing import List
-
-
-class mystr:
-    def __init__(self, num: str):
-        self.slist = list(num)
-        self.q = []  # 交换操作序列
-
-    def getstring(self) -> list:
-        res = []
-        index = 0   # slist的下标
-        j = 0   # q下标，用i == self.q[j][0]时替换
-        k = 0   # q下标，跳过index == self.q[k][1]
-        for i in range(len(self.slist)):
-            if j < len(self.q) and i == self.q[j][0]:
-                res.append(self.slist[self.q[j][1]])
-                j += 1
-            else:
-                while k < len(self.q) and index == self.q[k][1]:
-                    index += 1
-                    k += 1
-                res.append(self.slist[index])
-                index += 1
-        for i in range(len(self.slist)):
-            self.slist[i] = res[i]
-        self.q.clear()
-        return res
-
-    def front(self, l: int, r: int):
-        self.q.append((l, r))
-
-
+"""
+代码源自leecode@pastfoever
+"""
 class Solution:
-    # 判断a比b小
-    def low(self, a: List, b: List) -> bool:
-        k = 0
-        for i in range(len(a)):
-            if int(a[i]) != int(b[i]):
-                k = i
-                break
-        if k < len(a) and int(a[k]) < int(b[k]):
-            return True
-        return False
-
     def minInteger(self, num: str, k: int) -> str:
-        s = mystr(num)
+        info = [[] for _ in range(10)]
+        cur_pos = [0] * 10  # info中每个数字下一个可前移的位置的索引
+        cur_offset = [0] * 10  # 0-9每个数字的下一个可前移位置的偏移
+        history = [0] * len(num)  # num中对应的数字是否前移，前移(-1)，未前移(0)
+        res = []
+        # 记录下所有数字在num中的位置
+        for i, v in enumerate(num):
+            info[int(v)].append(i)
 
-        le = 0  # 左端点
-        spare = ['9' for i in range(len(num))]
-        for i in range(10):
-            clist = s.getstring()
-            args = [
-                index for index in range(
-                    len(clist)) if int(
-                    clist[index]) == i]
+        while k and len(res) < len(num):
+            # 从0开始找可以前移的数字
+            for i in range(10):
+                if cur_pos[i] < len(info[i]) and info[i][cur_pos[i]] + \
+                        cur_offset[i] <= len(res) + k:  # 符合前移条件
+                    k -= info[i][cur_pos[i]] + \
+                        cur_offset[i] - len(res)  # k减去消耗的前移步数
+                    res.append(str(i))
+                    history[info[i][cur_pos[i]]] -= 1  # 标记前移的数字
 
-            for j in args:
-                if j - le <= k:
-                    s.front(le, j)
+                    # 0-9每个数字更新由于本次前移造成的偏移
+                    for j in range(10):
+                        if cur_pos[j] < len(
+                                info[j]) and info[i][cur_pos[i]] >= info[j][cur_pos[j]]:
+                            cur_offset[j] += 1
 
-                    k -= j - le
-                    le += 1
-                else:
-                    temp = s.getstring()
-                    z = temp[j]
-                    temp.pop(j)
-                    temp.insert(j - k, z)
+                    cur_pos[i] += 1  # 当前数字的下一个可前移位置的索引
+                    # 更新当前数字的偏移(每遇到一个已经前移的数字，偏移减1)
+                    if cur_pos[i] < len(info[i]):
+                        for j in range(info[i][cur_pos[i] - 1],
+                                       info[i][cur_pos[i]]):
+                            cur_offset[i] += history[j]
 
-                    if self.low(temp, spare):
-                        spare = temp
                     break
-
-        clist = s.getstring()
-        if self.low(spare, clist):
-            clist = spare
-
-        res = ''.join(clist)
-        return res
+        # 添加所有未前移的数字
+        for i in range(len(num)):
+            if history[i] == 0:
+                res.append(num[i])
+        return ''.join(res)
 
 
 if __name__ == '__main__':
     print(
-        # Solution().minInteger("36789", 1000), "36789",
+        Solution().minInteger("3132", 2), "1323",
+        Solution().minInteger("36789", 1000), "36789",
         Solution().minInteger("294984148179", 11), "124498948179"
     )
