@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 # author:lyh
 # datetime:2020/7/14 13:41
+"""
+LinkHeap
+链表堆
+链表和堆的结合，结点维护链表的前驱、后继以及在堆中的坐标
+"""
 
 
 class Node:
@@ -29,6 +34,9 @@ class Node:
 
     def __lt__(self, other):
         return self.v < other.v
+
+    def __str__(self):
+        return "({}, {})".format(self.v, self.index)
 
 
 class LinkHeap:
@@ -66,15 +74,30 @@ class LinkHeap:
             left = index * 2 + 1
 
     def update(self, index):
+        """
+        修改节点值后，重新调整堆结构
+        :param index:被修改的节点坐标
+        :return:
+        """
         self._down(index)
         self._up(index)
 
     def push(self, n: Node):
+        """
+        添加节点
+        :param n:节点
+        :return:
+        """
         n.index = len(self.heap)
         self.heap.append(n)
         self.update(n.index)
 
     def pop(self, index=0) -> [Node, None]:
+        """
+        删除节点
+        :param index: 删除的节点坐标
+        :return: 删除的节点
+        """
         if index >= len(self.heap):
             return None
         res = self.heap[index]
@@ -85,6 +108,10 @@ class LinkHeap:
         return res
 
     def top(self) -> [Node, None]:
+        """
+        堆顶节点
+        :return: 堆顶节点
+        """
         return self.heap[0] if len(self.heap) > 0 else None
 
     def __len__(self):
@@ -103,5 +130,5 @@ if __name__ == '__main__':
         if top is None:
             break
         else:
-            print(top.v, top.next.v if top.next is not None else -1, top.pre.v if top.pre is not None else -1)
+            print(str(top), str(top.next) if top.next is not None else None, str(top.pre) if top.pre is not None else None)
             Node.drop(top)
