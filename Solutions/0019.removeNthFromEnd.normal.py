@@ -23,22 +23,22 @@ class ListNode:
 
 class Solution:
     def removeNthFromEnd(self, head: ListNode, n: int) -> ListNode:
-        nodes = []
-        while head is not None:
-            nodes.append(head)
-            head = head.next
-        if n == len(nodes):
-            if len(nodes) <= 1:
-                return None
-            else:
-                return nodes[1]
+        tail = head
+        for i in range(n - 1):
+            tail = tail.next
+        root = ListNode(0)
+        root.next = head
+        while tail.next is not None:
+            root = root.next
+            tail = tail.next
+        if root.next is head:
+            root.next = root.next.next
+            return root.next
         else:
-            nodes[-n - 1].next = nodes[-n].next
-            return nodes[0]
+            root.next = root.next.next
+            return head
 
 
 if __name__ == '__main__':
-    print(
-        Solution().removeNthFromEnd(ListNode.fromlist(
-            [1, 2, 3, 3, 5]), 2).tolist(), [1, 2, 3, 5],
-    )
+    print(Solution().removeNthFromEnd(ListNode.fromlist([1, 2, 3, 4, 5]), 2).tolist(), [1, 2, 3, 5])
+    print(Solution().removeNthFromEnd(ListNode.fromlist([1, 2]), 1).tolist(), [2])
