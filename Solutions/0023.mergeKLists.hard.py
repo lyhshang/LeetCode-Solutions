@@ -1,4 +1,5 @@
 from typing import List
+import heapq
 
 
 class ListNode:
@@ -26,33 +27,24 @@ class ListNode:
 
 class Solution:
     def mergeKLists(self, lists: List[ListNode]) -> ListNode:
-        if len(lists) == 2:
-            head = ListNode(0)
-            temp, x, y = head, lists[0], lists[1]
-            while x is not None and y is not None:
-                if x.val <= y.val:
-                    temp.next = x
-                    x = x.next
-                else:
-                    temp.next = y
-                    y = y.next
-                temp = temp.next
-            if x is not None:
-                temp.next = x
-            else:
-                temp.next = y
-            return head.next
-        elif len(lists) > 2:
-            res = []
-            for i in range(len(lists) // 2):
-                res.append(self.mergeKLists([lists[i * 2], lists[i * 2 + 1]]))
-            if len(lists) % 2 == 1:
-                res.append(lists[-1])
-            return self.mergeKLists(res)
+        if len(lists) == 0:
+            return None
         elif len(lists) == 1:
             return lists[0]
-        else:
-            return None
+        heap = []
+        for i in range(len(lists)):
+            if lists[i] is not None:
+                heapq.heappush(heap, (lists[i].val, i))
+        root = ListNode(-1)
+        tail = root
+        while len(heap) > 0:
+            v, index = heapq.heappop(heap)
+            tail.next = lists[index]
+            tail = tail.next
+            lists[index] = lists[index].next
+            if lists[index] is not None:
+                heapq.heappush(heap, (lists[index].val, index))
+        return root.next
 
 
 if __name__ == '__main__':
