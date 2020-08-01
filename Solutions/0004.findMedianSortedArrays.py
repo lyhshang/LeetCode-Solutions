@@ -39,8 +39,7 @@ from typing import List
 
 
 class Solution:
-    def findMedianSortedArrays(
-            self, nums1: List[int], nums2: List[int]) -> float:
+    def findMedianSortedArrays(self, nums1: List[int], nums2: List[int]) -> float:
         l1 = len(nums1)
         l2 = len(nums2)
         if l1 == 0 and l2 == 0:
@@ -52,79 +51,26 @@ class Solution:
             b = self.fingKSortedArrays(nums1, nums2, (l1 + l2) // 2 + 1)
             return (a + b) / 2
 
-    def fingKSortedArrays(
-            self, nums1: List[int], nums2: List[int], k: int) -> int:
-        l1 = 0
-        l2 = 0
-        r1 = len(nums1)
-        r2 = len(nums2)
+    def fingKSortedArrays(self, nums1: List[int], nums2: List[int], k: int) -> int:
+        i, j = 0, 0
         while k:
-            if k > 0:
-                if k == 1:
-                    if l1 == r1:
-                        return nums2[l2]
-                    elif l2 == r2:
-                        return nums1[l1]
-                    else:
-                        return nums1[l1] if nums1[l1] <= nums2[l2] else nums2[l2]
-                if r1 - l1 > k:
-                    r1 = l1 + k
-                if r2 - l2 > k:
-                    r2 = l2 + k
-                if r1 - l1 + r2 - l2 - k + 1 < k:
-                    rk = r1 - l1 + r2 - l2 - k + 1
-                    l1 = r1 - min(rk, r1 - l1)
-                    l2 = r2 - min(rk, r2 - l2)
-                    k = -rk
-                    continue
-                m1 = k // 2
-                m2 = k - m1
-                if nums1[l1 + m1 - 1] <= nums2[l2 + m2 - 1]:
-                    l1 = l1 + m1
-                    r2 = l2 + m2
-                    k = k - m1
-                    continue
-                else:
-                    r1 = l1 + m1
-                    l2 = l2 + m2
-                    k = k - m2
-                    continue
-            elif k < 0:
-                if k == -1:
-                    if l1 == r1:
-                        return nums2[r2 - 1]
-                    elif l2 == r2:
-                        return nums1[r1 - 1]
-                    else:
-                        return nums1[r1 - 1] if nums1[r1 -
-                                                      1] >= nums2[r2 - 1] else nums2[r2 - 1]
-                if r1 - l1 > -k:
-                    l1 = r1 - k
-                if r2 - l2 > -k:
-                    l2 = r2 - k
-                if r1 - l1 + r2 - l2 + k + 1 < -k:
-                    rk = r1 - l1 + r2 - l2 + k + 1
-                    r1 = l1 + min(rk, l1)
-                    r2 = l2 + min(rk, l2)
-                    k = rk
-                    continue
-                m1 = k // 2
-                m2 = k - m1
-                if nums1[r1 + m1] <= nums2[r2 + m2]:
-                    l1 = r1 + m1
-                    r2 = r2 + m2
-                    k = k - m2
-                    continue
-                else:
-                    r1 = r1 + m1
-                    l2 = r2 + m2
-                    k = k - m1
-                    continue
+            if i == len(nums1):
+                return nums2[j + k - 1]
+            elif j == len(nums2):
+                return nums1[i + k - 1]
+            elif k == 1:
+                return nums1[i] if nums1[i] < nums2[j] else nums2[j]
+            l1 = min(k // 2, len(nums1) - i)
+            l2 = min(k - l1, len(nums2) - j)
+            if nums1[i + l1 - 1] <= nums2[j + l2 - 1]:
+                i += l1
+                k -= l1
+            else:
+                j += l2
+                k -= l2
         return 0
 
 
 if __name__ == '__main__':
-    print(
-        Solution().findMedianSortedArrays([1, 3], [2]),
-        Solution().findMedianSortedArrays([1, 2], [3, 4]),
-    )
+    print(Solution().findMedianSortedArrays([1, 3], [2]), 2,)
+    print(Solution().findMedianSortedArrays([1, 2], [3, 4]), 2.5)
